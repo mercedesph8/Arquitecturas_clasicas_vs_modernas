@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Categoría</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+    a { text-decoration: none; }
+    .price { font-weight: 600; }
+  </style>
+</head>
+<body>
+  <p><a href="index.html">← Volver al inicio</a></p>
+  <h1 id="titulo">Categoría</h1>
+  <ul id="lista"></ul>
+
+  <script>
+    const API = 'api.php';
+
+    function getParam(name) {
+      return new URLSearchParams(location.search).get(name);
+    }
+
+    async function fetchJSON(url) {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('Error al cargar: ' + url);
+      return res.json();
+    }
+
+    async function cargarCategoria(slug) {
+      // Obtenemos nombre legible de la categoría
+      const categorias = await fetchJSON(`${API}?resource=categorias`);
+      const cat = categorias.find(c => c.slug === slug);
+      document.getElementById('titulo').textContent = cat ? `Categoría: ${cat.nombre}` : 'Categoría no encontrada';
+
+      // Listamos productos de la categoría
+      const productos = await fetchJSON(`${API}?resource=productos&categoria_slug=${encodeURIComponent(slug)}`);
+      const ul = document.getElementById('lista');
+      ul.innerHTML = '';
+
+      if (!productos.length) {
+        const li = document.createElement('li');
+        li.textContent = 'No hay productos en esta categoría.';
+        ul.appendChild(li);
+        return;
+      }
+
+      productos.forEach(p => {
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = `producto.html?id=${encodeURIComponent(p.id)}`;
+        a.textContent = p.nombre;
+        const span = document.createElement('span');
+        span.className = 'price';
+        span.textContent = ` — ${p.precio.toFixed(2)} €`;
+        li.appendChild(a);
+        li.appendChild(span);
+        ul.appendChild(li);
+      });
+    }
+
+    (async () => {
+      const slug = getParam('slug') || '';
+      try {
+        await cargarCategoria(slug);
+      } catch (e) {
+        alert(e.message);
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+<p><a routerLink="/">← Volver</a></p>
+
+<ng-container *ngIf="producto; else notFound">
+  <h1>{{ producto?.nombre }}</h1>
+  <p><strong>Precio:</strong> {{ producto?.precio | number:'1.2-2' }} €</p>
+  <p>
+    <strong>Categoría:</strong>
+    <a [routerLink]="['/categoria', producto?.categoria_slug]">{{ nombreCategoria }}</a>
+  </p>
+  <p>{{ producto?.descripcion }}</p>
+</ng-container>
+
+<ng-template #notFound>
+  <h1>Producto no encontrado</h1>
+</ng-template>

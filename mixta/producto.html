@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Producto</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+    a { text-decoration: none; }
+    .label { font-weight: 600; }
+  </style>
+</head>
+<body>
+  <p><a href="index.html">← Volver al inicio</a></p>
+  <h1 id="nombre">Cargando...</h1>
+  <p><span class="label">Precio:</span> <span id="precio"></span></p>
+  <p><span class="label">Categoría:</span> <a id="categoria" href="#"></a></p>
+  <p id="descripcion"></p>
+
+  <script>
+    const API = 'api.php';
+
+    function getParam(name) {
+      return new URLSearchParams(location.search).get(name);
+    }
+
+    async function fetchJSON(url) {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('Error al cargar: ' + url);
+      return res.json();
+    }
+
+    async function cargarProducto(id) {
+      try {
+        const p = await fetchJSON(`${API}?resource=producto&id=${encodeURIComponent(id)}`);
+
+        document.title = p.nombre;
+        document.getElementById('nombre').textContent = p.nombre;
+        document.getElementById('precio').textContent = `${p.precio.toFixed(2)} €`;
+
+        // Obtener nombre de la categoría
+        const categorias = await fetchJSON(`${API}?resource=categorias`);
+        const cat = categorias.find(c => c.slug === p.categoria_slug);
+        const aCat = document.getElementById('categoria');
+        aCat.textContent = cat ? cat.nombre : 'Sin categoría';
+        aCat.href = `categoria.html?slug=${encodeURIComponent(p.categoria_slug)}`;
+
+        document.getElementById('descripcion').textContent = p.descripcion;
+      } catch (e) {
+        document.getElementById('nombre').textContent = 'Producto no encontrado';
+        document.getElementById('precio').textContent = '-';
+        document.getElementById('categoria').textContent = '-';
+        document.getElementById('categoria').removeAttribute('href');
+        document.getElementById('descripcion').textContent = '';
+        alert(e.message);
+      }
+    }
+
+    (async () => {
+      const id = getParam('id');
+      await cargarProducto(id);
+    })();
+  </script>
+</body>
+</html>

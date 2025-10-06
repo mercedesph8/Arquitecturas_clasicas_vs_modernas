@@ -1,0 +1,24 @@
+<h1>Tienda (Angular 16 + PHP API)</h1>
+
+<section>
+  <h2>Categorías</h2>
+  <ul>
+    <li *ngFor="let c of categorias">
+      <a [routerLink]="['/categoria', c.slug]">{{ c.nombre }}</a>
+    </li>
+  </ul>
+</section>
+
+<section>
+  <h2>Productos destacados</h2>
+  <ng-container *ngIf="!cargando; else cargandoTpl">
+    <ul>
+      <li *ngFor="let p of productos">
+        <a [routerLink]="['/producto', p.id]">{{ p.nombre }}</a>
+        — {{ p.precio | number:'1.2-2' }} €
+      </li>
+    </ul>
+    <p *ngIf="error" style="color:crimson">{{ error }}</p>
+  </ng-container>
+  <ng-template #cargandoTpl> Cargando... </ng-template>
+</section>

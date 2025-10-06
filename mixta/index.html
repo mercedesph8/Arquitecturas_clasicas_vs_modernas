@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Tienda — Inicio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+    h1, h2 { margin: .5rem 0; }
+    ul { padding-left: 1.2rem; }
+    .price { font-weight: 600; }
+    a { text-decoration: none; }
+  </style>
+</head>
+<body>
+  <h1>Tienda (HTML + JS + API PHP)</h1>
+
+  <section>
+    <h2>Categorías</h2>
+    <ul id="lista-categorias"></ul>
+  </section>
+
+  <section>
+    <h2>Productos destacados</h2>
+    <ul id="lista-productos"></ul>
+  </section>
+
+  <script>
+    const API = 'api.php';
+
+    async function fetchJSON(url) {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('Error al cargar: ' + url);
+      return res.json();
+    }
+
+    function liLink(href, texto, extra = '') {
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.href = href;
+      a.textContent = texto;
+      li.appendChild(a);
+      if (extra) {
+        const span = document.createElement('span');
+        span.className = 'price';
+        span.textContent = ' — ' + extra;
+        li.appendChild(span);
+      }
+      return li;
+    }
+
+    async function cargarCategorias() {
+      const categorias = await fetchJSON(`${API}?resource=categorias`);
+      const ul = document.getElementById('lista-categorias');
+      ul.innerHTML = '';
+      categorias.forEach(cat => {
+        ul.appendChild(liLink(`categoria.html?slug=${encodeURIComponent(cat.slug)}`, cat.nombre));
+      });
+    }
+
+    async function cargarProductos() {
+      const productos = await fetchJSON(`${API}?resource=productos`);
+      const ul = document.getElementById('lista-productos');
+      ul.innerHTML = '';
+      productos.forEach(p => {
+        ul.appendChild(liLink(`producto.html?id=${encodeURIComponent(p.id)}`, p.nombre, `${p.precio.toFixed(2)} €`));
+      });
+    }
+
+    (async () => {
+      try {
+        await Promise.all([cargarCategorias(), cargarProductos()]);
+      } catch (e) {
+        alert(e.message);
+      }
+    })();
+  </script>
+</body>
+</html>

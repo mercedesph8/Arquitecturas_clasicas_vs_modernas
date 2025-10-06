@@ -1,0 +1,19 @@
+<p><a routerLink="/">← Volver</a></p>
+<h1>{{ nombreCategoria }}</h1>
+
+<ng-container *ngIf="!cargando; else loading">
+  <ul *ngIf="productos.length; else vacio">
+    <li *ngFor="let p of productos">
+      <a [routerLink]="['/producto', p.id]">{{ p.nombre }}</a>
+      — {{ p.precio | number:'1.2-2' }} €
+    </li>
+  </ul>
+</ng-container>
+
+<ng-template #vacio>
+  <p>No hay productos en esta categoría.</p>
+</ng-template>
+
+<ng-template #loading>
+  <p>Cargando...</p>
+</ng-template>

@@ -15,6 +15,7 @@
   <h1 id="nombre">Cargando...</h1>
   <p><span class="label">Precio:</span> <span id="precio"></span></p>
   <p><span class="label">Categoría:</span> <a id="categoria" href="#"></a></p>
+  <p> <img id= "img"></p>
   <p id="descripcion"></p>
 
   <script>
@@ -44,7 +45,8 @@
         const aCat = document.getElementById('categoria');
         aCat.textContent = cat ? cat.nombre : 'Sin categoría';
         aCat.href = `categoria.html?slug=${encodeURIComponent(p.categoria_slug)}`;
-
+        
+        document.getElementById('img').src = p.img;
         document.getElementById('descripcion').textContent = p.descripcion;
       } catch (e) {
         document.getElementById('nombre').textContent = 'Producto no encontrado';
